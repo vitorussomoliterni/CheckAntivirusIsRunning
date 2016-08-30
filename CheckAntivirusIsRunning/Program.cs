@@ -15,13 +15,15 @@ namespace CheckAntivirusIsRunning
 
         static void Main(string[] args)
         {
-            CheckIfMachineIsToIgnore();
+            //CheckIfMachineIsToIgnore();
+            //Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
+
             var machineInfo = GetMachineInfo();
 
             if (AntivirusExecutableMissing())
             {
-                machineInfo += _errorLog;
-                sendEmail(machineInfo); // TODO: Add error to log file
+                var emailText = machineInfo + _errorLog;
+                sendEmail(emailText); // TODO: Add error to log file
                 Environment.Exit(0);
             }
             
@@ -49,7 +51,7 @@ namespace CheckAntivirusIsRunning
             {
                 if (File.Exists(ConnectionDetails.ExecutablePath))
                 {
-                    return true;
+                    return false;
                 }
                 else
                 {
@@ -58,18 +60,18 @@ namespace CheckAntivirusIsRunning
             }
             catch (Exception e)
             {
-                _errorLog += e.ToString();
+                _errorLog += e.Message;
             }
 
-            return false;
+            return true;
         }
 
         private static string GetMachineInfo()
         {
-            string machineInfo = "Machine Name: " + Environment.MachineName + "/n";
-            machineInfo += "User: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "/n"; // Gets logged in username
-            machineInfo += "Date: " + DateTime.Now.ToLongDateString() + "/n";
-            machineInfo += "Time: " + DateTime.Now.ToLongTimeString() + "/n";
+            string machineInfo = "Machine Name: " + Environment.MachineName + "\n";
+            machineInfo += "User: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\n"; // Gets logged in username
+            machineInfo += "Date: " + DateTime.Now.ToLongDateString() + "\n";
+            machineInfo += "Time: " + DateTime.Now.ToLongTimeString() + "\n";
 
             return machineInfo;
         }
