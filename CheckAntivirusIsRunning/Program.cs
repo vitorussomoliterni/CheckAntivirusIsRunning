@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Mail;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CheckAntivirusIsRunning
@@ -11,18 +13,67 @@ namespace CheckAntivirusIsRunning
     {
         static void Main(string[] args)
         {
+            if (AntivirusExecutableMissing())
+            {
+                // TODO: Add what to do if antivirus executable is missing.
+            }
+            var machineInfo = GetMachineInfo();
 
+        }
+
+        private static bool AntivirusExecutableMissing()
+        {
+            try
+            {
+                if (File.Exists(ConnectionDetails.ExecutablePath))
+                {
+                    return true;
+                }
+                else
+                {
+                    throw new FileNotFoundException("No installation found");
+                }
+            }
+            catch (Exception e)
+            {
+                sendEmail(e.ToString());
+            }
+
+            return false;
+        }
+
+        private static string GetMachineInfo()
+        {
+            string machineInfo = "Machine Name: " + Environment.MachineName;
+            machineInfo += "\nUser: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
+            machineInfo += "\nDate: " + DateTime.Now.ToLongDateString();
+            machineInfo += "\nTime: " + DateTime.Now.ToLongTimeString();
+
+            return machineInfo;
+        }
+
+        private static string GetUserName()
+        {
+            var userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
+
+            while (userName == null || userName == string.Empty)
+            {
+                Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
+                userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
+            }
+
+            return userName;
         }
 
         public static void sendEmail(string emailText)
         {
             MailMessage mail = new MailMessage();
             mail.To.Add(ConnectionDetails.RecipientAddress);
-            mail.From = new MailAddress(ConnectionDetails.SenderAddress, ConnectionDetails.DisplayName, System.Text.Encoding.UTF8);
+            mail.From = new MailAddress(ConnectionDetails.SenderAddress, ConnectionDetails.DisplayName, Encoding.UTF8);
             mail.Subject = ConnectionDetails.Subject;
-            mail.SubjectEncoding = System.Text.Encoding.UTF8;
+            mail.SubjectEncoding = Encoding.UTF8;
             mail.Body = emailText;
-            mail.BodyEncoding = System.Text.Encoding.UTF8;
+            mail.BodyEncoding = Encoding.UTF8;
             mail.IsBodyHtml = false;
             mail.Priority = MailPriority.High;
             SmtpClient client = new SmtpClient();
