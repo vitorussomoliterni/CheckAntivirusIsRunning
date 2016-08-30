@@ -11,14 +11,36 @@ namespace CheckAntivirusIsRunning
 {
     class Program
     {
+        public static string _errorLog = "Error: ";
+
         static void Main(string[] args)
         {
-            if (AntivirusExecutableMissing())
-            {
-                // TODO: Add what to do if antivirus executable is missing.
-            }
+            CheckIfMachineIsToIgnore();
             var machineInfo = GetMachineInfo();
 
+            if (AntivirusExecutableMissing())
+            {
+                machineInfo += _errorLog;
+                sendEmail(machineInfo); // TODO: Add error to log file
+                Environment.Exit(0);
+            }
+            
+
+        }
+
+        private static void CheckIfMachineIsToIgnore()
+        {
+            string[] machinesToIgnore = new string[] { "namur", "zil", "catania", "corb" };
+
+            var currentMachine = Environment.MachineName.ToLower().Trim();
+
+            foreach (var item in machinesToIgnore)
+            {
+                if (item.Equals(currentMachine))
+                {
+                    Environment.Exit(0);
+                }
+            }
         }
 
         private static bool AntivirusExecutableMissing()
@@ -36,7 +58,7 @@ namespace CheckAntivirusIsRunning
             }
             catch (Exception e)
             {
-                sendEmail(e.ToString());
+                _errorLog += e.ToString();
             }
 
             return false;
@@ -44,10 +66,10 @@ namespace CheckAntivirusIsRunning
 
         private static string GetMachineInfo()
         {
-            string machineInfo = "Machine Name: " + Environment.MachineName;
-            machineInfo += "\nUser: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
-            machineInfo += "\nDate: " + DateTime.Now.ToLongDateString();
-            machineInfo += "\nTime: " + DateTime.Now.ToLongTimeString();
+            string machineInfo = "Machine Name: " + Environment.MachineName + "/n";
+            machineInfo += "User: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "/n"; // Gets logged in username
+            machineInfo += "Date: " + DateTime.Now.ToLongDateString() + "/n";
+            machineInfo += "Time: " + DateTime.Now.ToLongTimeString() + "/n";
 
             return machineInfo;
         }
