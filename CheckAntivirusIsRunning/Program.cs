@@ -14,7 +14,7 @@ namespace CheckAntivirusIsRunning
 
         static void Main(string[] args)
         {
-            //CheckIfMachineIsToIgnore(ConnectionDetails.MachinesToIgnore);
+            CheckIfMachineIsToIgnore(ConnectionDetails.MachinesToIgnore);
 
             var machineInfo = GetMachineInfo();
 
