@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Mail;
@@ -11,29 +12,58 @@ namespace CheckAntivirusIsRunning
 {
     class Program
     {
-        public static string _errorLog = "Error: ";
+        public static string _errorLog;
 
         static void Main(string[] args)
         {
-            //CheckIfMachineIsToIgnore();
-            //Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
+            //CheckIfMachineIsToIgnore(MachinesToIgnore);
 
             var machineInfo = GetMachineInfo();
 
-            if (AntivirusExecutableMissing())
-            {
-                var emailText = machineInfo + _errorLog;
-                sendEmail(emailText); // TODO: Add error to log file
-                Environment.Exit(0);
-            }
-            
+            //if (AntivirusExecutableMissing())
+            //{
+            //    var emailText = machineInfo + _errorLog;
+            //    sendEmail(emailText); // TODO: Add error to log file
+            //    Environment.Exit(0);
+            //}
 
+            //Thread.Sleep(600000); // Pauses the thread for 10 minutes (600000 milliseconds)
+
+            var userName = "User name: " + GetUserName() + "\n";
+
+            if (!ProcessesAreRunning(ConnectionDetails.Processes))
+            {
+                var emailText = userName + machineInfo + _errorLog;
+                sendEmail(emailText);
+            }
         }
 
-        private static void CheckIfMachineIsToIgnore()
+        private static bool ProcessesAreRunning(List<string> processes)
         {
-            string[] machinesToIgnore = new string[] { "namur", "zil", "catania", "corb" };
+            foreach (var process in processes)
+            {
+                var processFound = false;
+                foreach (var p in Process.GetProcesses())
+                {
+                    if (p.ProcessName.Trim().ToLower().Contains(process))
+                    {
+                        processFound = true;
+                        break;
+                    }
+                }
 
+                if (processFound == false)
+                {
+                    _errorLog = "Process error: " + process + " is not running.";
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static void CheckIfMachineIsToIgnore(List<string> machinesToIgnore)
+        {
             var currentMachine = Environment.MachineName.ToLower().Trim();
 
             foreach (var item in machinesToIgnore)
@@ -55,7 +85,7 @@ namespace CheckAntivirusIsRunning
                 }
                 else
                 {
-                    throw new FileNotFoundException("No installation found");
+                    throw new FileNotFoundException("Installation error: the executable was not found.");
                 }
             }
             catch (Exception e)
@@ -69,7 +99,6 @@ namespace CheckAntivirusIsRunning
         private static string GetMachineInfo()
         {
             string machineInfo = "Machine Name: " + Environment.MachineName + "\n";
-            machineInfo += "User: " + System.Security.Principal.WindowsIdentity.GetCurrent().Name + "\n"; // Gets logged in username
             machineInfo += "Date: " + DateTime.Now.ToLongDateString() + "\n";
             machineInfo += "Time: " + DateTime.Now.ToLongTimeString() + "\n";
 
@@ -80,12 +109,12 @@ namespace CheckAntivirusIsRunning
         {
             var userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
 
-            while (userName == null || userName == string.Empty)
+            while (string.IsNullOrEmpty(userName))
             {
                 Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
                 userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
             }
-
+            
             return userName;
         }
 
