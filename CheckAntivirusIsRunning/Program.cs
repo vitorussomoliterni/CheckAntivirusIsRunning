@@ -26,11 +26,12 @@ namespace CheckAntivirusIsRunning
                 Environment.Exit(0);
             }
 
-            var userName = "User name: " + GetUserName() + "\n";
-
+            WaitUserToBeLoggedIn();
+            
             if (!ProcessesAreRunning(ConnectionDetails.Processes))
             {
-                var emailText = userName + machineInfo + _errorLog;
+                machineInfo = "User name: " + GetUserName() + "\n" + machineInfo;
+                var emailText = machineInfo + _errorLog;
                 sendEmail(emailText);
                 Log(emailText);
             }
@@ -103,17 +104,22 @@ namespace CheckAntivirusIsRunning
             return machineInfo;
         }
 
-        private static string GetUserName()
+        private static bool WaitUserToBeLoggedIn()
         {
-            var userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
+            var userName = GetUserName();
 
             while (string.IsNullOrEmpty(userName))
             {
                 Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
-                userName = System.Security.Principal.WindowsIdentity.GetCurrent().Name; // Gets logged in username
+                userName = GetUserName();
             }
-            
-            return userName;
+
+            return true;
+        }
+
+        private static string GetUserName()
+        {            
+            return System.Security.Principal.WindowsIdentity.GetCurrent().Name;
         }
 
         public static void sendEmail(string emailText)
