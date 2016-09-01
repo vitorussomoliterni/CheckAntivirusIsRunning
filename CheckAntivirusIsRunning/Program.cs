@@ -26,8 +26,6 @@ namespace CheckAntivirusIsRunning
                 Environment.Exit(0);
             }
 
-            Thread.Sleep(600000); // Pauses the thread for 10 minutes (600000 milliseconds)
-
             var userName = "User name: " + GetUserName() + "\n";
 
             if (!ProcessesAreRunning(ConnectionDetails.Processes))
