@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace CheckAntivirusIsRunning
 {
@@ -16,18 +14,19 @@ namespace CheckAntivirusIsRunning
 
         static void Main(string[] args)
         {
-            //CheckIfMachineIsToIgnore(MachinesToIgnore);
+            //CheckIfMachineIsToIgnore(ConnectionDetails.MachinesToIgnore);
 
             var machineInfo = GetMachineInfo();
 
-            //if (AntivirusExecutableMissing())
-            //{
-            //    var emailText = machineInfo + _errorLog;
-            //    sendEmail(emailText); // TODO: Add error to log file
-            //    Environment.Exit(0);
-            //}
+            if (AntivirusExecutableMissing())
+            {
+                var emailText = machineInfo + _errorLog;
+                sendEmail(emailText);
+                Log(emailText);
+                Environment.Exit(0);
+            }
 
-            //Thread.Sleep(600000); // Pauses the thread for 10 minutes (600000 milliseconds)
+            Thread.Sleep(600000); // Pauses the thread for 10 minutes (600000 milliseconds)
 
             var userName = "User name: " + GetUserName() + "\n";
 
@@ -35,6 +34,7 @@ namespace CheckAntivirusIsRunning
             {
                 var emailText = userName + machineInfo + _errorLog;
                 sendEmail(emailText);
+                Log(emailText);
             }
         }
 
@@ -147,6 +147,22 @@ namespace CheckAntivirusIsRunning
                     errorMessage += ex2.ToString();
                     ex2 = ex2.InnerException;
                 }
+            }
+        }
+
+        public static void Log(string logMessage)
+        {
+            try
+            {
+                using (StreamWriter w = File.AppendText(ConnectionDetails.LogFilePath))
+                {
+                    w.WriteLine(logMessage);
+                    w.WriteLine("---------------------------------------------------------------------------\n");
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
             }
         }
     }
