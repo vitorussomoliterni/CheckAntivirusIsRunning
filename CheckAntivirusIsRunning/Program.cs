@@ -11,6 +11,7 @@ namespace CheckAntivirusIsRunning
     class Program
     {
         public static string _errorLog;
+        public static DateTime _startDate = DateTime.Now;
 
         static void Main(string[] args)
         {
@@ -110,6 +111,11 @@ namespace CheckAntivirusIsRunning
 
             while (string.IsNullOrEmpty(userName))
             {
+                var elapsedTime = DateTime.Now - _startDate;
+                if (elapsedTime.Minutes > 60) // Closes the script if it has been running pointlessly for over an hour.
+                {
+                    Environment.Exit(0);
+                }
                 Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
                 userName = GetUserName();
             }
