@@ -129,7 +129,14 @@ namespace CheckAntivirusIsRunning
         {
             ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem");
             ManagementObjectCollection collection = searcher.Get();
+
+            if (collection.Count == 0)
+            {
+                return null;
+            }
+
             string username = (string)collection.Cast<ManagementBaseObject>().First()["UserName"];
+
             return username;
         }
 
