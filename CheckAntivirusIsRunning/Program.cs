@@ -5,6 +5,8 @@ using System.IO;
 using System.Net.Mail;
 using System.Text;
 using System.Threading;
+using System.Management;
+using System.Linq;
 
 namespace CheckAntivirusIsRunning
 {
@@ -124,8 +126,11 @@ namespace CheckAntivirusIsRunning
         }
 
         private static string GetUserName()
-        {            
-            return System.Security.Principal.WindowsIdentity.GetCurrent().Name;
+        {
+            ManagementObjectSearcher searcher = new ManagementObjectSearcher("SELECT UserName FROM Win32_ComputerSystem");
+            ManagementObjectCollection collection = searcher.Get();
+            string username = (string)collection.Cast<ManagementBaseObject>().First()["UserName"];
+            return username;
         }
 
         public static void sendEmail(string emailText)
