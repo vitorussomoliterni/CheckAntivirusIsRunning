@@ -38,6 +38,13 @@ namespace CheckAntivirusIsRunning
                 sendEmail(emailText);
                 Log(emailText);
             }
+
+            if (string.IsNullOrEmpty(_errorLog))
+            {
+                var log = "No problem was found\n";
+                log += "User name: " + GetUserName() + "\n" + machineInfo;
+                Log(log);
+            }
         }
 
         private static bool ProcessesAreRunning(List<string> processes)
