@@ -24,18 +24,18 @@ namespace CheckAntivirusIsRunning
             if (AntivirusExecutableMissing())
             {
                 var emailText = machineInfo + _errorLog;
-                sendEmail(emailText);
+                SendEmail(emailText);
                 Log(emailText);
                 Environment.Exit(0);
             }
 
             WaitUserToBeLoggedIn();
-            
+
             if (!ProcessesAreRunning(ConnectionDetails.Processes))
             {
                 machineInfo = "User name: " + GetUserName() + "\n" + machineInfo;
                 var emailText = machineInfo + _errorLog;
-                sendEmail(emailText);
+                SendEmail(emailText);
                 Log(emailText);
             }
 
@@ -54,7 +54,7 @@ namespace CheckAntivirusIsRunning
                 var processFound = false;
                 foreach (var p in Process.GetProcesses())
                 {
-                    if (p.ProcessName.Trim().ToLower().Contains(process))
+                    if (!string.IsNullOrEmpty(p.ProcessName) && p.ProcessName.Trim().ToLower().Contains(process))
                     {
                         processFound = true;
                         break;
@@ -146,7 +146,7 @@ namespace CheckAntivirusIsRunning
             return username;
         }
 
-        private static void sendEmail(string emailText)
+        private static void SendEmail(string emailText)
         {
             MailMessage mail = new MailMessage();
             mail.To.Add(ConnectionDetails.RecipientAddress);
