@@ -12,8 +12,8 @@ namespace CheckAntivirusIsRunning
 {
     class Program
     {
-        public static string _errorLog;
-        public static DateTime _startDate = DateTime.Now;
+        private static string _errorLog;
+        private static DateTime _startDate = DateTime.Now;
 
         static void Main(string[] args)
         {
@@ -116,17 +116,14 @@ namespace CheckAntivirusIsRunning
 
         private static bool WaitUserToBeLoggedIn()
         {
-            var userName = GetUserName();
-
-            while (string.IsNullOrEmpty(userName))
+            while (string.IsNullOrEmpty(GetUserName()))
             {
                 var elapsedTime = DateTime.Now - _startDate;
                 if (elapsedTime.Minutes > 60) // Closes the script if it has been running pointlessly for over an hour.
                 {
                     Environment.Exit(0);
                 }
-                Thread.Sleep(600000); // Pauses the script for 10 minutes (600000 milliseconds)
-                userName = GetUserName();
+                Thread.Sleep(120000); // Pauses the script for 2 minutes (120000 milliseconds)
             }
 
             Thread.Sleep(300000); // Pauses the script for 5 minutes (300000 milliseconds)
@@ -149,7 +146,7 @@ namespace CheckAntivirusIsRunning
             return username;
         }
 
-        public static void sendEmail(string emailText)
+        private static void sendEmail(string emailText)
         {
             MailMessage mail = new MailMessage();
             mail.To.Add(ConnectionDetails.RecipientAddress);
@@ -181,7 +178,7 @@ namespace CheckAntivirusIsRunning
             }
         }
 
-        public static void Log(string logMessage)
+        private static void Log(string logMessage)
         {
             try
             {
