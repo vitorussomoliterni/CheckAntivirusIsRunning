@@ -129,6 +129,8 @@ namespace CheckAntivirusIsRunning
                 userName = GetUserName();
             }
 
+            Thread.Sleep(300000); // Pauses the script for 5 minutes (300000 milliseconds)
+
             return true;
         }
 
