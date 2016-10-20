@@ -39,11 +39,18 @@ namespace CheckAntivirusIsRunning
                 Log(emailText);
             }
 
-            if (string.IsNullOrEmpty(_errorLog))
+            else if (string.IsNullOrEmpty(_errorLog))
             {
                 var log = "No problem was found\n";
                 log += "User name: " + GetUserName() + "\n" + machineInfo;
                 Log(log);
+            }
+
+            else // In case no email need to be send but the error needs to be logged
+            {
+                machineInfo = "User name: " + GetUserName() + "\n" + machineInfo;
+                var logText = machineInfo + _errorLog;
+                Log(logText);
             }
         }
 
@@ -61,10 +68,16 @@ namespace CheckAntivirusIsRunning
                     }
                 }
 
-                if (processFound == false)
+                if (processFound == false && !process.Equals("tmlisten"))
                 {
                     _errorLog = "Process error: " + process + " is not running.";
                     return false;
+                }
+
+                if (processFound == false && !process.Equals("tmlisten")) // In case tmlisten is not found the error will be logged but no email will be sent
+                {
+                    _errorLog = "Process error: " + process + " is not running.";
+                    return true;
                 }
             }
 
