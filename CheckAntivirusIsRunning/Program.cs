@@ -24,7 +24,7 @@ namespace CheckAntivirusIsRunning
             if (AntivirusExecutableMissing())
             {
                 var emailText = machineInfo + _errorLog;
-                //SendEmail(emailText);
+                SendEmail(emailText);
                 Log(emailText);
                 Environment.Exit(0);
             }
