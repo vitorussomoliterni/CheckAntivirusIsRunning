@@ -17,14 +17,14 @@ namespace CheckAntivirusIsRunning
 
         static void Main(string[] args)
         {
-            CheckIfMachineIsToIgnore(ConnectionDetails.MachinesToIgnore);
+            //CheckIfMachineIsToIgnore(ConnectionDetails.MachinesToIgnore);
 
             var machineInfo = GetMachineInfo();
 
             if (AntivirusExecutableMissing())
             {
                 var emailText = machineInfo + _errorLog;
-                SendEmail(emailText);
+                //SendEmail(emailText);
                 Log(emailText);
                 Environment.Exit(0);
             }
@@ -74,7 +74,7 @@ namespace CheckAntivirusIsRunning
                     return false;
                 }
 
-                if (processFound == false && !process.Equals("tmlisten")) // In case tmlisten is not found the error will be logged but no email will be sent
+                if (processFound == false && process.Equals("tmlisten")) // In case tmlisten is not found the error will be logged but no email will be sent
                 {
                     _errorLog = "Process error: " + process + " is not running.";
                     return true;
@@ -136,10 +136,10 @@ namespace CheckAntivirusIsRunning
                 {
                     Environment.Exit(0);
                 }
-                Thread.Sleep(120000); // Pauses the script for 2 minutes (120000 milliseconds)
+                //Thread.Sleep(120000); // Pauses the script for 2 minutes (120000 milliseconds)
             }
 
-            Thread.Sleep(300000); // Pauses the script for 5 minutes (300000 milliseconds)
+            //Thread.Sleep(300000); // Pauses the script for 5 minutes (300000 milliseconds)
 
             return true;
         }
